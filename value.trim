@@ -1,0 +1,23 @@
+    if (username === 'admin' && password === 'jeff001') {
+        this.isAdmin = true;
+        sessionStorage.setItem('isAdmin', 'true');
+        this.uiManager.hideModal('adminLoginModal');
+        this.uiManager.showNotification('Admin login successful!');
+        this.updateAdminUI();
+
+        const pending = sessionStorage.getItem('pendingAdminAction');
+        if (pending) {
+            sessionStorage.removeItem('pendingAdminAction');
+            // support patterns like method:arg or method:arg1:arg2
+            const parts = pending.split(':');
+            const method = parts.shift();
+            const args = parts;
+            if (typeof this[method] === 'function') {
+                this[method](...args);
+            }
+        }
+    } else {
+        this.uiManager.showNotification('Invalid admin credentials', 'error');
+    }
+}
+

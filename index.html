@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="app-title" id="appTitle">Business Management System</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="settingsBtn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <div class="nav-section">
+                    <h3>Dashboard</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="dashboard" class="nav-link active">
+                            <i class="fas fa-chart-line"></i> Overview
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Businesses</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="guesthouse" class="nav-link">
+                            <i class="fas fa-bed"></i> Guest House
+                        </a></li>
+                        <li><a href="#" data-section="butchery" class="nav-link">
+                            <i class="fas fa-drumstick-bite"></i> Butchery
+                        </a></li>
+                        <li><a href="#" data-section="workshop" class="nav-link">
+                            <i class="fas fa-tools"></i> Workshop
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Customers</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="customers" class="nav-link">
+                            <i class="fas fa-users"></i> Customer Registration
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Sales</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="sales" class="nav-link">
+                            <i class="fas fa-cash-register"></i> Sales Records
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Reports</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="reports" class="nav-link">
+                            <i class="fas fa-file-invoice"></i> Sales Reports
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content" id="mainContent">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard Overview</h2>
+                </div>
+                <div class="dashboard-cards">
+                    <div class="card card-guesthouse">
+                        <div class="card-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Guest House</h3>
+                            <p class="card-value" id="guesthouseRevenue">KES 0</p>
+                            <p class="card-label">Today's Revenue</p>
+                        </div>
+                    </div>
+
+                    <div class="card card-butchery">
+                        <div class="card-icon">
+                            <i class="fas fa-drumstick-bite"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Butchery</h3>
+                            <p class="card-value" id="butcheryRevenue">KES 0</p>
+                            <p class="card-label">Today's Revenue</p>
+                        </div>
+                    </div>
+
+                    <div class="card card-workshop">
+                        <div class="card-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Workshop</h3>
+                            <p class="card-value" id="workshopRevenue">KES 0</p>
+                            <p class="card-label">Today's Revenue</p>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Customers Card -->
+                    <div class="card card-customers">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Customers</h3>
+                            <p class="card-value" id="customersCount">0</p>
+                            <p class="card-label">Total Customers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Transactions</h3>
+                    <div id="recentTransactions" class="activity-list">
+                        <!-- Recent transactions will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Guest House Section -->
+            <section id="guesthouse-section" class="section">
+                <div class="section-header">
+                    <h2>Guest House Management</h2>
+                    <button class="btn btn-primary" id="addGuesthouseItem">
+                        <i class="fas fa-plus"></i> Add Room
+                    </button>
+                </div>
+                <div class="table-container">
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('guesthouse')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <table id="guesthouseTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Room Type</th>
+                                <th>Price per Night</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guesthouseTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Butchery Section -->
+            <section id="butchery-section" class="section">
+                <div class="section-header">
+                    <h2>Butchery Management</h2>
+                    <button class="btn btn-primary" id="addButcheryItem">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <div class="table-container">
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('butchery')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <table id="butcheryTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Price per Kg</th>
+                                <th>Stock Available</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="butcheryTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Workshop Section -->
+            <section id="workshop-section" class="section">
+                <div class="section-header">
+                    <h2>Workshop Management</h2>
+                    <button class="btn btn-primary" id="addWorkshopService">
+                        <i class="fas fa-plus"></i> Add Service
+                    </button>
+                    <button class="btn btn-primary" id="addWorkshopProduct">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <h3>Services</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('workshop-services')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <table id="workshopServicesTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Price</th>
+                                <th>Duration (hrs)</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workshopServicesTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 2rem;">
+                    <h3>Products</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('workshop-products')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <table id="workshopProductsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workshopProductsTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section id="customers-section" class="section">
+                <div class="section-header">
+                    <h2>Customer Registration</h2>
+                    <button class="btn btn-primary" id="addCustomer">
+                        <i class="fas fa-plus"></i> Add Customer
+                    </button>
+                </div>
+                <div class="table-container">
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('customers')">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                    <table id="customersTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>National ID</th>
+                                <th>Address</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sales Section -->
+            <section id="sales-section" class="section">
+                <div class="section-header">
+                    <h2>Sales Records</h2>
+                </div>
+                <div class="table-container">
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('sales')">
+                            <i class="fas fa-print"></i> Print Sales
+                        </button>
+                    </div>
+                    <table id="salesTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Description</th>
+                                <th>Subtotal (KES)</th>
+                                <th>VAT (KES)</th>
+                                <th>Total (KES)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- Sales data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="section">
+                <div class="section-header">
+                    <h2>Sales Reports</h2>
+                </div>
+                <div class="report-filters">
+                    <select id="reportType" class="form-control">
+                        <option value="custom">Custom Range</option>
+                        <option value="daily">Daily Report</option>
+                        <option value="weekly">Weekly Report</option>
+                        <option value="monthly">Monthly Report</option>
+                    </select>
+                    <div id="dateRangeContainer" class="date-range-container">
+                        <input type="date" id="startDate" class="form-control" placeholder="Start Date">
+                        <input type="date" id="endDate" class="form-control" placeholder="End Date">
+                    </div>
+                    <div id="singleDateContainer" class="single-date-container" style="display: none;">
+                        <input type="date" id="reportDate" class="form-control">
+                    </div>
+                    <button class="btn btn-primary" id="generateReport">Generate Report</button>
+                    <button class="btn btn-secondary" id="printReport">
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                </div>
+                <div id="reportContent" class="report-content">
+                    <!-- Report will be generated here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Admin Login Modal -->
+        <div id="adminLoginModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Admin Login</h3>
+                    <button class="close-btn" id="closeAdminLogin">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminLoginForm">
+                        <div class="form-group">
+                            <label for="adminUsername">Username</label>
+                            <input type="text" id="adminUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Password</label>
+                            <input type="password" id="adminPassword" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="close-btn" id="closeSettings">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label for="businessName">Business Name</label>
+                            <input type="text" id="businessName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessAddress">Business Address</label>
+                            <textarea id="businessAddress" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency" class="form-control">
+                                <option value="KES">Kenyan Shilling (KES)</option>
+                                <option value="USD">US Dollar (USD)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taxRate">VAT Rate (%)</label>
+                            <input type="number" id="taxRate" class="form-control" min="0" max="100" step="0.1" required>
+                        </div>
+                        
+                        <h4>Theme Settings</h4>
+                        <div class="form-group">
+                            <label for="primaryColor">Primary Color</label>
+                            <input type="color" id="primaryColor" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="secondaryColor">Secondary Color</label>
+                            <input type="color" id="secondaryColor" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="guesthouseColor">Guest House Color</label>
+                            <input type="color" id="guesthouseColor" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="butcheryColor">Butchery Color</label>
+                            <input type="color" id="butcheryColor" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="workshopColor">Workshop Color</label>
+                            <input type="color" id="workshopColor" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dataManagement">Data Management</label>
+                            <div class="data-actions">
+                                <button type="button" class="btn btn-secondary" onclick="app.exportData()">
+                                    <i class="fas fa-download"></i> Export Data
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="app.importData()">
+                                    <i class="fas fa-upload"></i> Import Data
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="app.clearAllData()">
+                                    <i class="fas fa-trash"></i> Clear All Data
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Modal -->
+        <div id="customerModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="customerModalTitle">Add Customer</h3>
+                    <button class="close-btn" id="closeCustomerModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="customerForm">
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerId">National ID</label>
+                            <input type="text" id="customerId" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customerAddress">Address</label>
+                            <textarea id="customerAddress" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Customer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item Modal -->
+        <div id="itemModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="itemModalTitle">Add Item</h3>
+                    <button class="close-btn" id="closeItemModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="itemForm">
+                        <div id="itemFormFields">
+                            <!-- Dynamic form fields will be inserted here -->
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Item</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Modal -->
+        <div id="receiptModal" class="modal">
+            <div class="modal-content receipt-modal">
+                <div class="modal-header">
+                    <h3>Receipt</h3>
+                    <button class="close-btn" id="closeReceipt">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="receiptContent" class="receipt-content">
+                        <!-- Receipt will be generated here -->
+                    </div>
+                    <div class="receipt-actions">
+                        <button class="btn btn-secondary" id="printReceipt">Print</button>
+                        <button class="btn btn-primary" id="downloadReceipt">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="js/app.js"></script>
+        <script>
+            // Admin session check on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const isAdmin = sessionStorage.getItem('isAdmin');
+                if (!isAdmin) {
+                    // Show admin login modal
+                    document.getElementById('adminLoginModal').classList.add('active');
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
