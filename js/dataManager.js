@@ -7,6 +7,9 @@ export class DataManager {
         this.butcheryProducts = this.loadData('butcheryProducts') || this.getDefaultButcheryProducts();
         this.workshopServices = this.loadData('workshopServices') || this.getDefaultWorkshopServices();
         this.workshopProducts = this.loadData('workshopProducts') || this.getDefaultWorkshopProducts();
+        this.employees = this.loadData('employees') || [];
+        
+        console.log('DataManager initialized with employees:', this.employees); // Debug log
     }
 
     // Settings management
@@ -237,6 +240,93 @@ export class DataManager {
         service.id = this.generateId();
         this.workshopServices.push(service);
         this.saveData('workshopServices', this.workshopServices);
+    }
+
+    // Employee management
+    getEmployees() {
+        return this.employees;
+    }
+
+    generateEmployeeId() {
+        const employees = this.employees || [];
+        const nextNumber = employees.length + 1;
+        return `EMPL-${String(nextNumber).padStart(3, '0')}`;
+    }
+
+    addEmployee(employee) {
+        employee.id = this.generateEmployeeId();
+        employee.createdAt = new Date().toISOString();
+        this.employees.push(employee);
+        this.saveData('employees', this.employees);
+        console.log('Employee saved:', employee); // Debug log
+    }
+
+    updateEmployee(id, updatedEmployee) {
+        const index = this.employees.findIndex(emp => emp.id === id);
+        if (index !== -1) {
+            this.employees[index] = { ...this.employees[index], ...updatedEmployee };
+            this.saveData('employees', this.employees);
+        }
+    }
+
+    deleteEmployee(id) {
+        this.employees = this.employees.filter(emp => emp.id !== id);
+        this.saveData('employees', this.employees);
+    }
+
+    calculateNetPay(grossSalary, deductions) {
+        return Math.max(0, grossSalary - deductions);
+    }
+
+    generatePayslip(employee, payPeriod) {
+        const settings = this.getSettings();
+        const taxRate = settings.taxRate || 16;
+        const paye = (employee.grossSalary * taxRate) / 100;
+        const nssf = Math.min(employee.grossSalary * 0.06, 2160); // 6% of gross, max 2160
+        const nhif = this.calculateNHIF(employee.grossSalary);
+        const nita = 50; // Fixed NITA levy
+        const housingLevy = (employee.grossSalary * 1.5) / 100; // 1.5% of gross salary
+        const totalDeductions = paye + nssf + nhif + nita + housingLevy + employee.deductions;
+        const netPay = employee.grossSalary - totalDeductions;
+
+        return {
+            employeeId: employee.id,
+            employeeName: employee.name,
+            payPeriod: payPeriod,
+            grossSalary: employee.grossSalary,
+            allowances: employee.allowances || 0,
+            deductions: employee.deductions,
+            paye: paye,
+            nssf: nssf,
+            nhif: nhif,
+            nita: nita,
+            housingLevy: housingLevy,
+            totalDeductions: totalDeductions,
+            netPay: netPay,
+            advance: employee.advance || 0,
+            payFrequency: employee.payFrequency,
+            generatedDate: new Date().toISOString()
+        };
+    }
+
+    calculateNHIF(salary) {
+        if (salary <= 5999) return 150;
+        if (salary <= 7999) return 300;
+        if (salary <= 11999) return 400;
+        if (salary <= 14999) return 500;
+        if (salary <= 19999) return 600;
+        if (salary <= 24999) return 750;
+        if (salary <= 29999) return 850;
+        if (salary <= 34999) return 900;
+        if (salary <= 39999) return 950;
+        if (salary <= 44999) return 1000;
+        if (salary <= 49999) return 1100;
+        if (salary <= 59999) return 1200;
+        if (salary <= 69999) return 1300;
+        if (salary <= 79999) return 1400;
+        if (salary <= 89999) return 1500;
+        if (salary <= 99999) return 1600;
+        return 1700;
     }
 
     // Generic item management

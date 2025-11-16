@@ -27,6 +27,29 @@ export class BusinessManagementSystem {
         this.applyTheme();
         this.setupAdminLogin();
         this.updateAdminUI();
+        
+        // Add test employee if none exist
+        this.initializeTestData();
+    }
+
+    initializeTestData() {
+        const employees = this.dataManager.getEmployees();
+        if (employees.length === 0) {
+            // Add a test employee
+            const testEmployee = {
+                name: 'John Doe',
+                contact: '+254700000000',
+                grossSalary: 50000,
+                deductions: 5000,
+                advance: 0,
+                payFrequency: 'Monthly',
+                payMonth: 'January',
+                payDay: 30
+            };
+            
+            this.dataManager.addEmployee(testEmployee);
+            console.log('Added test employee:', testEmployee);
+        }
     }
 
     setupAdminLogin() {
@@ -141,11 +164,14 @@ export class BusinessManagementSystem {
             case 'customers':
                 this.loadCustomers();
                 break;
-            case 'reports':
-                this.loadReports();
+            case 'employees':
+                this.loadEmployees();
                 break;
             case 'sales':
                 this.loadSales();
+                break;
+            case 'reports':
+                this.loadReports();
                 break;
         }
 
@@ -215,6 +241,20 @@ export class BusinessManagementSystem {
             this.saveCustomer();
         });
 
+        // Employee management
+        document.getElementById('addEmployee').addEventListener('click', () => {
+            this.openEmployeeModal();
+        });
+
+        document.getElementById('closeEmployeeModal').addEventListener('click', () => {
+            this.uiManager.hideModal('employeeModal');
+        });
+
+        document.getElementById('employeeForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveEmployee();
+        });
+
         // Add items
         document.getElementById('addGuesthouseItem').addEventListener('click', () => {
             this.openItemModal('guesthouse');
@@ -245,6 +285,19 @@ export class BusinessManagementSystem {
         // Receipt
         document.getElementById('closeReceipt').addEventListener('click', () => {
             this.uiManager.hideModal('receiptModal');
+        });
+
+        // Payslip
+        document.getElementById('closePayslip').addEventListener('click', () => {
+            this.uiManager.hideModal('payslipModal');
+        });
+
+        document.getElementById('printPayslip').addEventListener('click', () => {
+            this.printPayslip();
+        });
+
+        document.getElementById('downloadPayslip').addEventListener('click', () => {
+            this.downloadPayslip();
         });
 
         document.getElementById('printReceipt').addEventListener('click', () => {
@@ -322,6 +375,73 @@ export class BusinessManagementSystem {
         if (theme.workshopColor) {
             document.documentElement.style.setProperty('--workshop-color', theme.workshopColor);
         }
+        
+        // NEW: Apply navbar colors
+        if (theme.navbarBackground) {
+            document.documentElement.style.setProperty('--navbar-background', theme.navbarBackground);
+            document.querySelector('.header').style.backgroundColor = theme.navbarBackground;
+            document.querySelector('.sidebar').style.backgroundColor = theme.navbarBackground;
+        }
+        if (theme.navbarText) {
+            document.documentElement.style.setProperty('--navbar-text', theme.navbarText);
+            document.querySelector('.header').style.color = theme.navbarText;
+            document.querySelector('.app-title').style.color = theme.navbarText;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.style.color = theme.navbarText;
+            });
+        }
+        if (theme.navbarHover) {
+            document.documentElement.style.setProperty('--navbar-hover', theme.navbarHover);
+            // Update hover styles dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                .nav-link:hover {
+                    color: ${theme.navbarHover} !important;
+                    background-color: ${theme.navbarHover}1a !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        if (theme.navbarActive) {
+            document.documentElement.style.setProperty('--navbar-active', theme.navbarActive);
+            // Update active nav link color
+            document.querySelectorAll('.nav-link.active').forEach(link => {
+                link.style.backgroundColor = theme.navbarActive;
+                link.style.color = 'white';
+            });
+        }
+
+        // NEW: Apply sidebar colors
+        if (theme.sidebarBackground) {
+            document.documentElement.style.setProperty('--sidebar-background', theme.sidebarBackground);
+            document.querySelector('.sidebar').style.backgroundColor = theme.sidebarBackground;
+        }
+        if (theme.sidebarText) {
+            document.documentElement.style.setProperty('--sidebar-text', theme.sidebarText);
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.style.color = theme.sidebarText;
+            });
+        }
+        if (theme.sidebarHover) {
+            document.documentElement.style.setProperty('--sidebar-hover', theme.sidebarHover);
+            // Update hover styles dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                .nav-link:hover {
+                    color: ${theme.sidebarHover} !important;
+                    background-color: ${theme.sidebarHover}1a !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        if (theme.sidebarActive) {
+            document.documentElement.style.setProperty('--sidebar-active', theme.sidebarActive);
+            // Update active nav link color
+            document.querySelectorAll('.nav-link.active').forEach(link => {
+                link.style.backgroundColor = theme.sidebarActive;
+                link.style.color = 'white';
+            });
+        }
     }
 
     loadSettings() {
@@ -339,6 +459,18 @@ export class BusinessManagementSystem {
         document.getElementById('guesthouseColor').value = theme.guesthouseColor || '#9b59b6';
         document.getElementById('butcheryColor').value = theme.butcheryColor || '#e67e22';
         document.getElementById('workshopColor').value = theme.workshopColor || '#34495e';
+        
+        // NEW: Load navbar color settings
+        document.getElementById('navbarBackground').value = theme.navbarBackground || '#ffffff';
+        document.getElementById('navbarText').value = theme.navbarText || '#2c3e50';
+        document.getElementById('navbarHover').value = theme.navbarHover || '#3498db';
+        document.getElementById('navbarActive').value = theme.navbarActive || '#3498db';
+        
+        // NEW: Load sidebar color settings
+        document.getElementById('sidebarBackground').value = theme.sidebarBackground || '#ffffff';
+        document.getElementById('sidebarText').value = theme.sidebarText || '#2c3e50';
+        document.getElementById('sidebarHover').value = theme.sidebarHover || '#3498db';
+        document.getElementById('sidebarActive').value = theme.sidebarActive || '#3498db';
     }
 
     saveSettings() {
@@ -352,7 +484,17 @@ export class BusinessManagementSystem {
                 secondaryColor: document.getElementById('secondaryColor').value,
                 guesthouseColor: document.getElementById('guesthouseColor').value,
                 butcheryColor: document.getElementById('butcheryColor').value,
-                workshopColor: document.getElementById('workshopColor').value
+                workshopColor: document.getElementById('workshopColor').value,
+                // NEW: Save navbar color settings
+                navbarBackground: document.getElementById('navbarBackground').value,
+                navbarText: document.getElementById('navbarText').value,
+                navbarHover: document.getElementById('navbarHover').value,
+                navbarActive: document.getElementById('navbarActive').value,
+                // NEW: Save sidebar color settings
+                sidebarBackground: document.getElementById('sidebarBackground').value,
+                sidebarText: document.getElementById('sidebarText').value,
+                sidebarHover: document.getElementById('sidebarHover').value,
+                sidebarActive: document.getElementById('sidebarActive').value
             }
         };
 
@@ -376,7 +518,51 @@ export class BusinessManagementSystem {
         const customers = this.dataManager.getCustomers();
         document.getElementById('customersCount').textContent = customers.length.toLocaleString();
 
+        // Update employees count
+        const employees = this.dataManager.getEmployees();
+        document.getElementById('employeesCount').textContent = employees.length.toLocaleString();
+
         this.loadRecentTransactions();
+        this.loadDashboardEmployees(); // NEW: Load employees on dashboard
+    }
+
+    // NEW: Load employees for dashboard display
+    loadDashboardEmployees() {
+        const employees = this.dataManager.getEmployees().slice(0, 5); // Show latest 5 employees
+        const container = document.getElementById('dashboardEmployees');
+        
+        if (employees.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No employees found</p>';
+            return;
+        }
+
+        container.innerHTML = employees.map(employee => {
+            const netPay = this.dataManager.calculateNetPay(employee.grossSalary, employee.deductions);
+            return `
+                <tr>
+                    <td>${employee.id}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.contact}</td>
+                    <td>KES ${employee.grossSalary.toLocaleString()}</td>
+                    <td>KES ${employee.deductions.toLocaleString()}</td>
+                    <td>KES ${netPay.toLocaleString()}</td>
+                    <td>KES ${(employee.advance || 0).toLocaleString()}</td>
+                    <td>${employee.payFrequency}</td>
+                    <td>${employee.payMonth}</td>
+                    <td>${employee.payDay}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-sm btn-info" onclick="app.generatePayslip('${employee.id}')">
+                                <i class="fas fa-file-invoice"></i> Payslip
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.editEmployee('${employee.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     loadRecentTransactions() {
@@ -542,6 +728,9 @@ export class BusinessManagementSystem {
                 <td>${new Date(service.createdAt || Date.now()).toLocaleDateString()}</td>
                 <td>
                     <div class="actions">
+                        <button class="btn btn-sm btn-secondary" onclick="app.editService('${service.id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
                         <button class="btn btn-sm btn-secondary" onclick="app.bookService('${service.id}')">
                             <i class="fas fa-wrench"></i> Book
                         </button>
@@ -1562,6 +1751,371 @@ export class BusinessManagementSystem {
     loadReports() {
         // Set default date to today
         document.getElementById('reportDate').valueAsDate = new Date();
+    }
+
+    editService(serviceId) {
+        const service = this.dataManager.getWorkshopService(serviceId);
+        if (!service) return;
+
+        // Set current business to workshop-service for editing
+        this.currentBusiness = 'workshop-service';
+
+        const title = document.getElementById('itemModalTitle');
+        title.textContent = 'Edit Service';
+
+        const formFields = document.getElementById('itemFormFields');
+        formFields.innerHTML = `
+            <div class="form-group">
+                <label for="serviceName">Service Name</label>
+                <input type="text" id="serviceName" class="form-control" value="${service.name}" required>
+            </div>
+            <div class="form-group">
+                <label for="servicePrice">Price (KES)</label>
+                <input type="number" id="servicePrice" class="form-control" value="${service.price}" required>
+            </div>
+            <div class="form-group">
+                <label for="serviceDuration">Duration (hours)</label>
+                <input type="number" id="serviceDuration" class="form-control" value="${service.duration}" required>
+            </div>
+        `;
+
+        // Store the service ID for updating
+        document.getElementById('itemForm').dataset.editingId = serviceId;
+
+        this.uiManager.showModal('itemModal');
+    }
+
+    getDefaultSettings() {
+        return {
+            businessName: 'Business Management System',
+            businessAddress: '123 Business Street, City, Country',
+            currency: 'KES',
+            taxRate: 16, // 16% VAT
+            theme: {
+                primaryColor: '#3498db',
+                secondaryColor: '#2c3e50',
+                guesthouseColor: '#9b59b6',
+                butcheryColor: '#e67e22',
+                workshopColor: '#34495e',
+                // NEW: Separate navbar and sidebar color settings
+                navbarBackground: '#ffffff',
+                navbarText: '#2c3e50',
+                navbarHover: '#3498db',
+                navbarActive: '#3498db',
+                sidebarBackground: '#ffffff',
+                sidebarText: '#2c3e50',
+                sidebarHover: '#3498db',
+                sidebarActive: '#3498db'
+            }
+        };
+    }
+
+    // Employee management
+    loadEmployees() {
+        try {
+            const employees = this.dataManager.getEmployees();
+            const tbody = document.getElementById('employeesTableBody');
+
+            console.log('Loading employees:', employees); // Debug log
+
+            if (!employees || employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No employees found. Click "Add Employee" to create the first employee.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = employees.map(employee => {
+                const netPay = this.dataManager.calculateNetPay(employee.grossSalary, employee.deductions);
+                return `
+                    <tr>
+                        <td>${employee.id}</td>
+                        <td>${employee.name}</td>
+                        <td>${employee.contact}</td>
+                        <td>KES ${employee.grossSalary.toLocaleString()}</td>
+                        <td>KES ${employee.deductions.toLocaleString()}</td>
+                        <td>KES ${netPay.toLocaleString()}</td>
+                        <td>KES ${(employee.advance || 0).toLocaleString()}</td>
+                        <td>${employee.payFrequency}</td>
+                        <td>${employee.payMonth}</td>
+                        <td>${employee.payDay}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary" onclick="app.editEmployee('${employee.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info" onclick="app.generatePayslip('${employee.id}')">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="app.deleteEmployee('${employee.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading employees:', error);
+            this.uiManager.showNotification('Error loading employees', 'error');
+        }
+    }
+
+    openEmployeeModal(employeeId = null) {
+        const title = document.getElementById('employeeModalTitle');
+        title.textContent = employeeId ? 'Edit Employee' : 'Add Employee';
+
+        // Clear form
+        document.getElementById('employeeForm').reset();
+
+        if (employeeId) {
+            const employee = this.dataManager.getEmployees().find(emp => emp.id === employeeId);
+            if (employee) {
+                document.getElementById('employeeName').value = employee.name;
+                document.getElementById('employeeContact').value = employee.contact;
+                document.getElementById('employeeGrossSalary').value = employee.grossSalary;
+                document.getElementById('employeeAllowances').value = employee.allowances || 0;
+                document.getElementById('employeeDeductions').value = employee.deductions;
+                document.getElementById('employeeAdvance').value = employee.advance || 0;
+                document.getElementById('employeePayFrequency').value = employee.payFrequency;
+                document.getElementById('employeePayMonth').value = employee.payMonth;
+                document.getElementById('employeePayDay').value = employee.payDay;
+            }
+        }
+
+        // Store employee ID for editing
+        document.getElementById('employeeForm').dataset.editingId = employeeId || '';
+
+        this.uiManager.showModal('employeeModal');
+    }
+
+    saveEmployee() {
+        const employeeId = document.getElementById('employeeForm').dataset.editingId;
+        const employee = {
+            name: document.getElementById('employeeName').value,
+            contact: document.getElementById('employeeContact').value,
+            grossSalary: parseFloat(document.getElementById('employeeGrossSalary').value),
+            allowances: parseFloat(document.getElementById('employeeAllowances').value) || 0,
+            deductions: parseFloat(document.getElementById('employeeDeductions').value) || 0,
+            advance: parseFloat(document.getElementById('employeeAdvance').value) || 0,
+            payFrequency: document.getElementById('employeePayFrequency').value,
+            payMonth: document.getElementById('employeePayMonth').value,
+            payDay: document.getElementById('employeePayDay').value
+        };
+
+        if (employeeId) {
+            this.dataManager.updateEmployee(employeeId, employee);
+            this.uiManager.showNotification('Employee updated successfully!');
+        } else {
+            this.dataManager.addEmployee(employee);
+            this.uiManager.showNotification('Employee added successfully!');
+        }
+
+        this.uiManager.hideModal('employeeModal');
+        this.loadEmployees();
+        this.loadDashboard(); // Refresh dashboard to show updated employee count
+    }
+
+    deleteEmployee(employeeId) {
+        if (confirm('Are you sure you want to delete this employee?')) {
+            this.dataManager.deleteEmployee(employeeId);
+            this.uiManager.showNotification('Employee deleted successfully!');
+            this.loadEmployees();
+        }
+    }
+
+    generatePayslip(employeeId) {
+        const employee = this.dataManager.getEmployees().find(emp => emp.id === employeeId);
+        if (!employee) return;
+
+        const payPeriod = prompt('Enter pay period (e.g., January 2024):');
+        if (!payPeriod) return;
+
+        const payslip = this.dataManager.generatePayslip(employee, payPeriod);
+        this.showPayslipModal(payslip);
+    }
+
+    showPayslipModal(payslip) {
+        const payslipHTML = this.generatePayslipHTML(payslip);
+        document.getElementById('payslipContent').innerHTML = payslipHTML;
+        this.uiManager.showModal('payslipModal');
+    }
+
+    generatePayslipHTML(payslip) {
+        const settings = this.dataManager.getSettings();
+        const now = new Date();
+        
+        return `
+            <div class="payslip-header">
+                <h2>${settings.businessName}</h2>
+                <p>${settings.businessAddress}</p>
+                <h3>PAYSLIP</h3>
+                <p>Generated: ${now.toLocaleString('en-KE')}</p>
+            </div>
+            
+            <div class="payslip-info">
+                <div class="info-row">
+                    <strong>Employee Name:</strong> ${payslip.employeeName}
+                </div>
+                <div class="info-row">
+                    <strong>Employee ID:</strong> ${payslip.employeeId}
+                </div>
+                <div class="info-row">
+                    <strong>Pay Period:</strong> ${payslip.payPeriod}
+                </div>
+                <div class="info-row">
+                    <strong>Pay Frequency:</strong> ${payslip.payFrequency}
+                </div>
+            </div>
+            
+            <div class="payslip-earnings">
+                <h4>EARNINGS</h4>
+                <div class="payslip-row">
+                    <span>Basic Salary:</span>
+                    <span>KES ${payslip.grossSalary.toLocaleString()}</span>
+                </div>
+                ${payslip.allowances > 0 ? `
+                <div class="payslip-row">
+                    <span>Allowances:</span>
+                    <span>KES ${payslip.allowances.toLocaleString()}</span>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="payslip-deductions">
+                <h4>DEDUCTIONS</h4>
+                <div class="payslip-row">
+                    <span>PAYE (Tax):</span>
+                    <span>KES ${payslip.paye.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>NSSF:</span>
+                    <span>KES ${payslip.nssf.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>NHIF:</span>
+                    <span>KES ${payslip.nhif.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>NITA:</span>
+                    <span>KES ${payslip.nita.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>Housing Levy (1.5%):</span>
+                    <span>KES ${payslip.housingLevy.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>Other Deductions:</span>
+                    <span>KES ${payslip.deductions.toLocaleString()}</span>
+                </div>
+                <div class="payslip-row">
+                    <span>Advance:</span>
+                    <span>KES ${payslip.advance.toLocaleString()}</span>
+                </div>
+            </div>
+            
+            <div class="payslip-total">
+                <div class="payslip-row">
+                    <strong>TOTAL DEDUCTIONS:</strong>
+                    <strong>KES ${payslip.totalDeductions.toLocaleString()}</strong>
+                </div>
+                <div class="payslip-row">
+                    <strong>NET PAY:</strong>
+                    <strong>KES ${payslip.netPay.toLocaleString()}</strong>
+                </div>
+            </div>
+            
+            <div class="payslip-footer">
+                <p>This is a computer-generated payslip and does not require a signature.</p>
+                <p>Generated by Business Management System</p>
+            </div>
+        `;
+    }
+
+    editEmployee(employeeId) {
+        this.openEmployeeModal(employeeId);
+    }
+
+    printPayslip() {
+        const payslipContent = document.getElementById('payslipContent').innerHTML;
+        const settings = this.dataManager.getSettings();
+        const now = new Date();
+        
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Payslip - ${settings.businessName}</title>
+                <style>
+                    body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; width: 300px; }
+                    .payslip-header { text-align: center; margin-bottom: 20px; }
+                    .payslip-header h2 { margin-bottom: 5px; font-size: 1.2em; }
+                    .payslip-header h3 { margin: 10px 0; color: #3498db; }
+                    .payslip-header p { margin: 2px 0; font-size: 0.9em; }
+                    .payslip-info { margin: 15px 0; }
+                    .info-row { margin-bottom: 5px; padding: 5px; background: #f5f5f5; border-radius: 3px; }
+                    .payslip-earnings, .payslip-deductions { margin: 15px 0; }
+                    .payslip-earnings h4, .payslip-deductions h4 { margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px; }
+                    .payslip-row { display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px 0; border-bottom: 1px dotted #ccc; }
+                    .payslip-total { margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; font-weight: bold; font-size: 1.1em; background: #f5f5f5; padding: 10px; border-radius: 3px; }
+                    .payslip-footer { margin-top: 20px; text-align: center; font-size: 0.8em; font-style: italic; }
+                </style>
+            </head>
+            <body>
+                ${payslipContent}
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    downloadPayslip() {
+        const payslipContent = document.getElementById('payslipContent').innerHTML;
+        const settings = this.dataManager.getSettings();
+        const now = new Date();
+        
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Payslip - ${settings.businessName}</title>
+                <style>
+                    body { font-family: 'Courier New', monospace; margin: 0; padding: 20px; max-width: 400px; margin: 0 auto; }
+                    .payslip-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #000; padding-bottom: 15px; }
+                    .payslip-header h2 { margin-bottom: 5px; font-size: 1.4em; font-weight: bold; }
+                    .payslip-header h3 { margin: 10px 0; color: #3498db; font-size: 1.2em; }
+                    .payslip-header p { margin: 3px 0; font-size: 0.9em; line-height: 1.3; }
+                    .payslip-info { margin: 15px 0; }
+                    .info-row { margin-bottom: 5px; padding: 8px; background: #f8f9fa; border-radius: 4px; display: flex; justify-content: space-between; }
+                    .payslip-earnings, .payslip-deductions { margin: 20px 0; }
+                    .payslip-earnings h4, .payslip-deductions h4 { margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px; font-size: 1.1em; }
+                    .payslip-row { display: flex; justify-content: space-between; margin-bottom: 5px; padding: 5px 0; border-bottom: 1px dotted #ccc; }
+                    .payslip-total { margin-top: 20px; padding-top: 15px; border-top: 2px solid #000; font-weight: bold; font-size: 1.2em; background: #f8f9fa; padding: 15px; border-radius: 4px; }
+                    .payslip-footer { margin-top: 25px; text-align: center; font-size: 0.8em; line-height: 1.4; font-style: italic; color: #666; }
+                </style>
+            </head>
+            <body>
+                ${payslipContent}
+                <div style="text-align: center; margin-top: 30px; font-size: 0.7em; color: #666;">
+                    <p>--- This is a computer-generated payslip ---</p>
+                    <p>Generated: ${now.toLocaleString('en-KE')}</p>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        
+        setTimeout(() => {
+            printWindow.print();
+            setTimeout(() => {
+                if (printWindow && !printWindow.closed) {
+                    printWindow.close();
+                }
+            }, 1000);
+        }, 200);
+        
+        this.uiManager.showNotification('Payslip downloaded successfully!');
     }
 }
 

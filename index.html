@@ -60,6 +60,15 @@
                 </div>
 
                 <div class="nav-section">
+                    <h3>Employees</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" data-section="employees" class="nav-link">
+                            <i class="fas fa-user-tie"></i> Employee Management
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
                     <h3>Sales</h3>
                     <ul class="nav-links">
                         <li><a href="#" data-section="sales" class="nav-link">
@@ -130,12 +139,56 @@
                             <p class="card-label">Total Customers</p>
                         </div>
                     </div>
+
+                    <!-- NEW: Employees Card -->
+                    <div class="card card-employees">
+                        <div class="card-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Employees</h3>
+                            <p class="card-value" id="employeesCount">0</p>
+                            <p class="card-label">Total Employees</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="recent-activity">
                     <h3>Recent Transactions</h3>
                     <div id="recentTransactions" class="activity-list">
                         <!-- Recent transactions will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- NEW: Employees Section on Dashboard -->
+                <div class="recent-activity" style="margin-top: 2rem;">
+                    <h3>Recent Employees</h3>
+                    <div class="table-container" style="padding: 1rem;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Gross Salary</th>
+                                    <th>Deductions</th>
+                                    <th>Net Pay</th>
+                                    <th>Advance</th>
+                                    <th>Pay Frequency</th>
+                                    <th>Pay Month</th>
+                                    <th>Pay Day</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardEmployees">
+                                <!-- Employee data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="app.switchSection('employees')">
+                            <i class="fas fa-users"></i> View All Employees
+                        </button>
                     </div>
                 </div>
             </section>
@@ -294,6 +347,43 @@
                 </div>
             </section>
 
+            <!-- Employees Section -->
+            <section id="employees-section" class="section">
+                <div class="section-header">
+                    <h2>Employee Management</h2>
+                    <button class="btn btn-primary" id="addEmployee">
+                        <i class="fas fa-plus"></i> Add Employee
+                    </button>
+                </div>
+                <div class="table-container">
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="app.printTable('employees')">
+                            <i class="fas fa-print"></i> Print Employees
+                        </button>
+                    </div>
+                    <table id="employeesTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Gross Salary</th>
+                                <th>Deductions</th>
+                                <th>Net Pay</th>
+                                <th>Advance</th>
+                                <th>Pay Frequency</th>
+                                <th>Pay Month</th>
+                                <th>Pay Day</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                            <!-- Employee data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Sales Section -->
             <section id="sales-section" class="section">
                 <div class="section-header">
@@ -429,6 +519,44 @@
                             <input type="color" id="workshopColor" class="form-control">
                         </div>
                         
+                        <!-- NEW: Navbar Color Settings -->
+                        <h4>Navbar Colors</h4>
+                        <div class="form-group">
+                            <label for="navbarBackground">Navbar Background</label>
+                            <input type="color" id="navbarBackground" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="navbarText">Navbar Text Color</label>
+                            <input type="color" id="navbarText" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="navbarHover">Navbar Hover Color</label>
+                            <input type="color" id="navbarHover" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="navbarActive">Navbar Active Color</label>
+                            <input type="color" id="navbarActive" class="form-control">
+                        </div>
+                        
+                        <!-- NEW: Separate Sidebar Color Settings -->
+                        <h4>Sidebar Colors</h4>
+                        <div class="form-group">
+                            <label for="sidebarBackground">Sidebar Background</label>
+                            <input type="color" id="sidebarBackground" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="sidebarText">Sidebar Text Color</label>
+                            <input type="color" id="sidebarText" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="sidebarHover">Sidebar Hover Color</label>
+                            <input type="color" id="sidebarHover" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="sidebarActive">Sidebar Active Color</label>
+                            <input type="color" id="sidebarActive" class="form-control">
+                        </div>
+                        
                         <div class="form-group">
                             <label for="dataManagement">Data Management</label>
                             <div class="data-actions">
@@ -495,6 +623,93 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Save Item</button>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Modal -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="employeeModalTitle">Add Employee</h3>
+                    <button class="close-btn" id="closeEmployeeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="employeeForm">
+                        <div class="form-group">
+                            <label for="employeeName">Full Name</label>
+                            <input type="text" id="employeeName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeContact">Contact Number</label>
+                            <input type="tel" id="employeeContact" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeGrossSalary">Gross Salary (KES)</label>
+                            <input type="number" id="employeeGrossSalary" class="form-control" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeAllowances">Allowances (KES)</label>
+                            <input type="number" id="employeeAllowances" class="form-control" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeDeductions">Deductions (KES)</label>
+                            <input type="number" id="employeeDeductions" class="form-control" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeAdvance">Advance (KES)</label>
+                            <input type="number" id="employeeAdvance" class="form-control" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="employeePayFrequency">Pay Frequency</label>
+                            <select id="employeePayFrequency" class="form-control" required>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly" selected>Monthly</option>
+                                <option value="Bi-weekly">Bi-weekly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeePayMonth">Pay Month</label>
+                            <select id="employeePayMonth" class="form-control" required>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeePayDay">Pay Day</label>
+                            <input type="number" id="employeePayDay" class="form-control" min="1" max="31" value="30" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Employee</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payslip Modal -->
+        <div id="payslipModal" class="modal">
+            <div class="modal-content receipt-modal">
+                <div class="modal-header">
+                    <h3>Payslip</h3>
+                    <button class="close-btn" id="closePayslip">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="payslipContent" class="payslip-content">
+                        <!-- Payslip will be generated here -->
+                    </div>
+                    <div class="payslip-actions">
+                        <button class="btn btn-secondary" id="printPayslip">Print</button>
+                        <button class="btn btn-primary" id="downloadPayslip">Download PDF</button>
+                    </div>
                 </div>
             </div>
         </div>
